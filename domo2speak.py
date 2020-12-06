@@ -9,7 +9,8 @@ from gtts import gTTS, gTTSError
 parser = argparse.ArgumentParser(prog="domo2speak")
 group = parser.add_argument_group(title="Basics Arguments")
 group.add_argument("-v", "--verbose", help = "Affichage d'une log", action="store_true")
-group.add_argument("-d", "--device",  help = "Nom du Chromecast", default=None)
+group.add_argument("-d", "--device",  help = "Nom du Chromecast", default=None, required = True)
+group.add_argument("-s", "--sound",   help = "Volume", default=100)
 
 group = parser.add_argument_group(title="gTTS Arguments", description="Value for gTTS generation")
 group.add_argument("-t", "--text", help = "Texte à communiquer", default=None, required = True)
@@ -21,7 +22,7 @@ class domo2speak():
     "Classe de gestion des messages à envoyer depuis Domoticz (ou autre) vers l'un des Google Home"
 
     FILE_NAME = "media.mp3"
-    BASE_ROOT = "http://www.breizhcat/"
+    BASE_ROOT = "http://www.breizhcat.fr/"
 
     def __init__(self, args):
         self.debug  = args.verbose
@@ -35,6 +36,11 @@ class domo2speak():
         self.folder = args.folder
 
         self.output_media = ""
+
+        try:
+            self.volume = int(args.sound)
+        except ValueError:
+            self.volume = 100
 
         if not os.path.exists(self.folder):
             raise Exception("Error:", "Folder doesn't exist !")
@@ -94,13 +100,32 @@ class domo2speak():
         cast.wait()
         old_volume = cast.status.volume_level
         self.log("____ Old Volume Value:" + str(old_volume))
+        self.log("____ URL Media: " + self.BASE_ROOT + self.FILE_NAME)
+        
         cast.play_media(self.BASE_ROOT + self.FILE_NAME, "audio/mp3")
-        #cast.set_volume(100)
+        
+        cast.set_volume(self.volume)
+        
         cast.media_controller.block_until_active()
         cast.media_controller.play()
+        
+        is_playing = False
+        while True:
+            try:
+                time.sleep(1)
+                if cast.media_controller.status.player_state == 'PLAYING':
+                    is_playing = True
+
+                if cast.media_controller.status.player_state == 'IDLE' and is_playing:
+                    cast.media_controller.stop()
+                    break
+
+            except KeyboardInterrupt:
+                break
+        
         cast.set_volume(old_volume)
-        cast.media_controller.stop()
         cast.quit_app()
+        
        
     def _get_cast_device(self):
         if self.is_error:
