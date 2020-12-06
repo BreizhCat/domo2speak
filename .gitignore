@@ -4,3 +4,4 @@ tests
 tests/*
 __pycache__/*
 __pycache__
+conf.json

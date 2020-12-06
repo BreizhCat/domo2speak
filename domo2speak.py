@@ -5,6 +5,9 @@ import pychromecast
 import sys
 import os
 from gtts import gTTS, gTTSError
+import json
+
+__FULL_PATH__ = './' # To be updated acconrding to your needs
 
 parser = argparse.ArgumentParser(prog="domo2speak")
 group = parser.add_argument_group(title="Basics Arguments")
@@ -21,15 +24,17 @@ args = parser.parse_args()
 class domo2speak():
     "Classe de gestion des messages à envoyer depuis Domoticz (ou autre) vers l'un des Google Home"
 
-    FILE_NAME = "media.mp3"
-    BASE_ROOT = "http://www.breizhcat.fr/"
-
     def __init__(self, args):
         self.debug  = args.verbose
         if self.debug:
             logging.basicConfig(format='%(levelname)s:%(message)s', level = logging.INFO)
         
         self.logging = logging.getLogger()        
+        
+        with open(__FULL_PATH__ + 'conf.json') as param_data:
+            data = json.load(param_data)
+            self.file_name = data['file_name']
+            self.base_root = data['root_url']
 
         self.device = args.device
         self.text   = args.text
@@ -46,11 +51,12 @@ class domo2speak():
             raise Exception("Error:", "Folder doesn't exist !")
 
         if self.folder.endswith("\\"):
-            self.output_media = self.folder + domo2speak.FILE_NAME
+            self.output_media = self.folder + self.file_name
         else:
-            self.output_media = self.folder + "\\" + domo2speak.FILE_NAME
+            self.output_media = self.folder + "\\" + self.file_name
 
         self.is_error = False
+
 
 
     def log(self, message, level = logging.INFO):
@@ -100,9 +106,9 @@ class domo2speak():
         cast.wait()
         old_volume = cast.status.volume_level
         self.log("____ Old Volume Value:" + str(old_volume))
-        self.log("____ URL Media: " + self.BASE_ROOT + self.FILE_NAME)
+        self.log("____ URL Media: " + self.base_root + self.file_name)
         
-        cast.play_media(self.BASE_ROOT + self.FILE_NAME, "audio/mp3")
+        cast.play_media(self.base_root + self.file_name, "audio/mp3")
         
         cast.set_volume(self.volume)
         
