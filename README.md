@@ -29,13 +29,19 @@ gTTS Arguments:
                         Dossier de sauvegarde
 ```
 
+## Example
+```shell
+python domo2speak.py -t "text"  -f "location of media file" -d Hub -s 1 -v
+```
+
 Please also update Python code with the folder where the configuration is `__FULL_PATH__`
 And finally configure the configuration file `conf.json` by renamming the file `conf.json.model`
 
 ```json
 {
     "file_name":"media.mp3",
-    "root_url":"url_to_access_to_media_file"
+    "root_url":"url_to_access_to_media_file",
+    "language":"en"
 }
 ```
 

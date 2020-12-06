@@ -35,6 +35,7 @@ class domo2speak():
             data = json.load(param_data)
             self.file_name = data['file_name']
             self.base_root = data['root_url']
+            self.language = data['language']
 
         self.device = args.device
         self.text   = args.text
@@ -84,7 +85,7 @@ class domo2speak():
             self.log("____ No previous media found")
 
         try:
-            tts = gTTS(text=self.text, lang="fr")
+            tts = gTTS(text=self.text, lang=self.language)
             self.log("____ gTTS request works!")
             tts.save(self.output_media)
             self.log("____ Media saved !")
