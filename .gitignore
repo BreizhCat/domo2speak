@@ -1,0 +1,6 @@
+old_test.py
+*.mp3
+tests
+tests/*
+__pycache__/*
+__pycache__
