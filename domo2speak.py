@@ -2,12 +2,13 @@ import argparse
 import logging
 import time
 import pychromecast
+import pprint
 import sys
 import os
 from gtts import gTTS, gTTSError
 import json
 
-__FULL_PATH__ = './' # To be updated acconrding to your needs
+__FULL_PATH__ = './' # To be updated according to your needs
 
 parser = argparse.ArgumentParser(prog="domo2speak")
 group = parser.add_argument_group(title="Basics Arguments")
@@ -149,6 +150,4 @@ class domo2speak():
         
 
 run = domo2speak(args)
-run.create_audio_message()
-run.send_to_device()
-sys.exit(0)
+print(vars(run))
